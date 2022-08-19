@@ -1,0 +1,33 @@
+{
+	"compilerOptions": {
+		"target": "es6",
+		"lib": ["es5", "es2015", "es2016", "dom", "esnext"],
+		"types": ["node"],
+		"baseUrl": "src",
+		"jsx": "react",
+		"strict": true,
+		"sourceMap": true,
+		"declaration": true,
+		"skipLibCheck": true,
+		"esModuleInterop": true,
+		"isolatedModules": true,
+		"strictNullChecks": true,
+		"resolveJsonModule": true,
+		"downlevelIteration": true,
+		"allowSyntheticDefaultImports": true,
+		"suppressImplicitAnyIndexErrors": true,
+		"forceConsistentCasingInFileNames": true,
+		"moduleResolution": "node",
+		"noImplicitAny": true,
+		"noImplicitThis": true,
+		"noUnusedLocals": true,
+		"noImplicitReturns": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true
+	},
+	"tsc-alias": {
+		"resolveFullPaths": true
+	},
+	"include": ["src"],
+	"exclude": ["lib", "node_modules"]
+}

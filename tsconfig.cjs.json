@@ -1,0 +1,11 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"declarationDir": "lib/types",
+		"outDir": "lib/cjs",
+		"module": "CommonJS",
+		"allowJs": true
+	}
+}

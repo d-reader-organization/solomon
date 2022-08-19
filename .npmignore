@@ -1,0 +1,20 @@
+## production
+lib
+
+## node modules
+node_modules
+
+## git repository related files
+.git
+.npmrc
+.DS_Store
+.gitignore
+
+# other
+.babelrc
+.storybook
+.prettierrc
+config.gypi
+tsconfig.json
+rollup.config.js
+package-lock.json

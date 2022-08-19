@@ -1,0 +1,107 @@
+{
+	"name": "@open-sauce/solomon",
+	"version": "0.1.0",
+	"description": "Utility library for dapps built on Solana",
+	"homepage": "https://github.com/open-sauce-labs/solomon",
+	"license": "MIT",
+	"repository": "open-sauce-labs/solomon",
+	"private": false,
+	"type": "module",
+	"main": "./lib/cjs/index.js",
+	"module": "./lib/esm/index.js",
+	"types": "./lib/types/index.d.ts",
+	"exports": {
+		"require": "./lib/cjs/index.js",
+		"import": "./lib/esm/index.js",
+		"types": "./lib/types/index.d.ts"
+	},
+	"files": [
+		"lib",
+		"LICENSE"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"bugs": {
+		"url": "https://github.com/open-sauce-labs/solomon/issues"
+	},
+	"author": {
+		"name": "josip-volarevic",
+		"email": "josip.volarevic4@gmail.com"
+	},
+	"keywords": [
+		"react",
+		"solana",
+		"typescript",
+		"dapp",
+		"open-source",
+		"token-gating"
+	],
+	"engines": {
+		"node": ">=16",
+		"npm": ">=8"
+	},
+	"scripts": {
+		"prebuild": "rm -rf lib/ && prettier --write src/",
+		"build": "npm run build:esm & npm run build:cjs",
+		"build:esm": "tsc --project tsconfig.esm.json && tsc-alias --dir lib/esm",
+		"build:cjs": "tsc --project tsconfig.cjs.json && tsc-alias --dir lib/cjs",
+		"preversion": "npm run build",
+		"postversion": "git push --follow-tags"
+	},
+	"eslintConfig": {
+		"extends": [
+			"react-app"
+		]
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	},
+	"peerDependencies": {
+		"@solana/spl-token": "^0.3.4",
+		"@solana/wallet-adapter-base": "^0.9.16",
+		"@solana/wallet-adapter-react": "^0.15.18",
+		"@solana/wallet-adapter-wallets": "^0.18.5",
+		"@solana/web3.js": "^1.53.0",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0"
+	},
+	"devDependencies": {
+		"@solana/spl-token": "^0.3.4",
+		"@solana/wallet-adapter-base": "^0.9.16",
+		"@solana/wallet-adapter-react": "^0.15.18",
+		"@solana/wallet-adapter-wallets": "^0.18.5",
+		"@solana/web3.js": "^1.53.0",
+		"@types/node": "^18.7.13",
+		"@types/react": "^18.0.17",
+		"@types/react-dom": "^18.0.6",
+		"@typescript-eslint/eslint-plugin": "^5.35.1",
+		"@typescript-eslint/parser": "^5.35.1",
+		"babel-core": "^7.0.0-bridge.0",
+		"babel-runtime": "^6.26.0",
+		"eslint": "^8.22.0",
+		"eslint-config-airbnb": "^19.0.4",
+		"eslint-config-airbnb-typescript": "^17.0.0",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-config-react-app": "^7.0.1",
+		"eslint-plugin-import": "^2.26.0",
+		"eslint-plugin-jsx-a11y": "^6.6.1",
+		"eslint-plugin-prettier": "^4.2.1",
+		"eslint-plugin-react": "^7.31.0",
+		"eslint-plugin-react-hooks": "^4.6.0",
+		"prettier": "^2.7.1",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"tsc-alias": "^1.7.0",
+		"typescript": "^4.7.4"
+	}
+}
