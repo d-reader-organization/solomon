@@ -26,3 +26,9 @@ export const getWallets = (network: WalletAdapterNetwork) => [
 	new SolletExtensionWalletAdapter({ network }),
 	new BitKeepWalletAdapter(),
 ]
+
+export const wallets = {
+	[WalletAdapterNetwork.Mainnet]: getWallets(WalletAdapterNetwork.Mainnet),
+	[WalletAdapterNetwork.Devnet]: getWallets(WalletAdapterNetwork.Devnet),
+	[WalletAdapterNetwork.Testnet]: getWallets(WalletAdapterNetwork.Testnet),
+}
