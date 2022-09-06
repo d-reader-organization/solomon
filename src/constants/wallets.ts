@@ -10,8 +10,8 @@ import {
 	SolongWalletAdapter,
 	TorusWalletAdapter,
 } from '@solana/wallet-adapter-wallets'
-import { PhantomLedgerWalletAdapter } from 'wallet-adapter-wallets'
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
+import { phantomLedger } from './phantomLedgerAdapter'
 
 export const getWallets = (network: WalletAdapterNetwork) => [
 	new PhantomWalletAdapter(),
@@ -19,7 +19,7 @@ export const getWallets = (network: WalletAdapterNetwork) => [
 	new SolflareWalletAdapter({ network }),
 	new GlowWalletAdapter(),
 	new SolongWalletAdapter(),
-	new PhantomLedgerWalletAdapter(),
+	phantomLedger,
 	new SafePalWalletAdapter(),
 	new LedgerWalletAdapter(),
 	new SolletWalletAdapter({ network }),
