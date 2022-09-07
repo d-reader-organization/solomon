@@ -73,8 +73,10 @@
 		"@solana/wallet-adapter-react": "^0.15.18",
 		"@solana/wallet-adapter-wallets": "^0.18.5",
 		"@solana/web3.js": "^1.53.0",
+		"axios": "^0.27.2",
 		"react": "^18.2.0",
-		"react-dom": "^18.2.0"
+		"react-dom": "^18.2.0",
+		"bs58": "^5.0.0"
 	},
 	"devDependencies": {
 		"@solana/spl-token": "^0.3.4",
@@ -87,8 +89,10 @@
 		"@types/react-dom": "^18.0.6",
 		"@typescript-eslint/eslint-plugin": "^5.36.1",
 		"@typescript-eslint/parser": "^5.36.1",
+		"axios": "^0.27.2",
 		"babel-core": "^7.0.0-bridge.0",
 		"babel-runtime": "^6.26.0",
+		"bs58": "^5.0.0",
 		"eslint": "^8.23.0",
 		"eslint-config-airbnb": "^19.0.4",
 		"eslint-config-airbnb-typescript": "^17.0.0",
