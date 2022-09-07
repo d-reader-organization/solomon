@@ -1,6 +1,6 @@
 # solomon
 
-> Utility library for dapps built on Solana
+> Utility library for frontend dapps built on Solana
 
 [![NPM](https://img.shields.io/npm/v/@open-sauce/solomon)](https://www.npmjs.com/package/@open-sauce/solomon) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-typescript-brightgreen.svg)](https://standardjs.com)
 

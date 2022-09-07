@@ -1,7 +1,7 @@
 {
 	"name": "@open-sauce/solomon",
-	"version": "0.1.4",
-	"description": "Utility library for dapps built on Solana",
+	"version": "0.1.5",
+	"description": "Utility library for frontend dapps built on Solana",
 	"homepage": "https://github.com/open-sauce-labs/solomon",
 	"license": "MIT",
 	"repository": "open-sauce-labs/solomon",
