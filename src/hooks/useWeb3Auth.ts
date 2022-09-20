@@ -38,7 +38,7 @@ export const useWeb3Auth = (http: AxiosInstance): Web3AuthHook => {
 
 	/** Initialize the login process by requesting a one time password */
 	const requestPassword = useCallback(async () => {
-		const response = await http.get<string>(`auth/request-password/${walletAddress}`)
+		const response = await http.get<string>(`auth/wallet/request-password/${walletAddress}`)
 		return response.data
 	}, [http, walletAddress])
 
@@ -74,7 +74,7 @@ export const useWeb3Auth = (http: AxiosInstance): Web3AuthHook => {
 	/** Send the encoded password to backend in an attempt to connect to the server */
 	const connectWallet = useCallback(
 		async (encoding: string) => {
-			const response = await http.get<Authorization>(`auth/connect/${walletAddress}/${encoding}`)
+			const response = await http.get<Authorization>(`auth/wallet/connect/${walletAddress}/${encoding}`)
 			return response.data
 		},
 		[http, walletAddress]
@@ -85,7 +85,7 @@ export const useWeb3Auth = (http: AxiosInstance): Web3AuthHook => {
 		const lsWallet = lsGetWallet(walletAddress)
 		if (!lsWallet?.refreshToken) throw new Error('No refresh token found in local storage!')
 
-		const { data: accessToken } = await http.get<string>(`auth/refresh-token/${lsWallet.refreshToken}`)
+		const { data: accessToken } = await http.get<string>(`auth/wallet/refresh-token/${lsWallet.refreshToken}`)
 		addAuthHeaders(http, accessToken)
 		lsSetWallet(walletAddress, { accessToken })
 
