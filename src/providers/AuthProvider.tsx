@@ -24,10 +24,10 @@ interface Props {
 
 const AuthProvider: React.FC<Props> = ({ http, children }) => {
 	const [isAuthenticating, setIsAuthenticating] = useState(false)
+	const [isAuthenticated, setIsAuthenticated] = useState(false)
 	const { autoconnect, connect } = useWeb3Auth(http)
 	const { publicKey, disconnecting } = useWallet()
 	const walletAddress = useMemo(() => publicKey?.toString() || '', [publicKey])
-	const isAuthenticated = !!http.defaults.headers.common.Authorization
 	// TODO: const toaster = useToaster() or throw errors properly
 
 	const authenticateWallet = useCallback(async () => {
@@ -44,6 +44,7 @@ const AuthProvider: React.FC<Props> = ({ http, children }) => {
 				const authorization = await connect()
 				lsSetWallet(walletAddress, authorization)
 				addAuthHeaders(http, authorization.accessToken)
+				setIsAuthenticated(true)
 			} catch (error) {
 				// const message = queryError(error)
 				// toaster.add(message, 'error')
@@ -52,7 +53,7 @@ const AuthProvider: React.FC<Props> = ({ http, children }) => {
 			} finally {
 				setIsAuthenticating(false)
 			}
-		}
+		} else setIsAuthenticated(true)
 	}, [autoconnect, connect, http, walletAddress])
 
 	/*
