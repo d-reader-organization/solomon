@@ -43,7 +43,7 @@ const devnetRpcNodeProviders: RpcNodeProvider[] = [
 	},
 	{
 		name: 'GenesysGo',
-		endpoint: 'https://ssc-dao.genesysgo.net',
+		endpoint: 'https://devnet.genesysgo.net',
 	},
 	{
 		name: 'Serum',
