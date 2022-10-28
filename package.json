@@ -1,6 +1,6 @@
 {
 	"name": "@open-sauce/solomon",
-	"version": "0.1.10",
+	"version": "0.1.11",
 	"description": "Utility library for frontend dapps built on Solana",
 	"homepage": "https://github.com/open-sauce-labs/solomon",
 	"license": "MIT",
@@ -67,12 +67,12 @@
 		]
 	},
 	"peerDependencies": {
-		"@mui/material": "^5.10.3",
+		"@mui/material": "^5.10.11",
 		"@solana/spl-token": "^0.3.5",
 		"@solana/wallet-adapter-base": "^0.9.18",
-		"@solana/wallet-adapter-react": "^0.15.20",
-		"@solana/wallet-adapter-wallets": "^0.19.1",
-		"@solana/web3.js": "^1.64.0",
+		"@solana/wallet-adapter-react": "^0.15.21-rc.4",
+		"@solana/wallet-adapter-wallets": "^0.19.5",
+		"@solana/web3.js": "^1.66.2",
 		"axios": "^1.1.2",
 		"bs58": "^5.0.0",
 		"react": "^18.2.0",
@@ -81,7 +81,7 @@
 	"devDependencies": {
 		"@solana/spl-token": "^0.3.5",
 		"@solana/wallet-adapter-base": "^0.9.18",
-		"@solana/wallet-adapter-react": "^0.15.20",
+		"@solana/wallet-adapter-react": "^0.15.21-rc.4",
 		"@solana/wallet-adapter-wallets": "^0.19.5",
 		"@solana/web3.js": "^1.66.2",
 		"@types/node": "^18.11.7",
