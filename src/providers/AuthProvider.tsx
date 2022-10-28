@@ -41,9 +41,9 @@ const AuthProvider: React.FC<Props> = ({ http, children }) => {
 			setIsAuthenticating(true)
 
 			try {
-				const authorization = await connect()
-				lsSetWallet(walletAddress, authorization)
-				addAuthHeaders(http, authorization.accessToken)
+				const authentication = await connect()
+				lsSetWallet(walletAddress, authentication)
+				addAuthHeaders(http, authentication.accessToken)
 				setIsAuthenticated(true)
 			} catch (error) {
 				// const message = queryError(error)
@@ -57,14 +57,15 @@ const AuthProvider: React.FC<Props> = ({ http, children }) => {
 	}, [autoconnect, connect, http, walletAddress])
 
 	/*
-	If wallet is disconnecting - remove authorization
-	If wallet is connected - add authorization
+	If wallet is disconnecting - remove authentication
+	If wallet is connected - add authentication
 	*/
 	useEffect(() => {
 		if (walletAddress) {
 			if (disconnecting) {
 				removeAuthHeaders(http)
 				lsRemoveWalletAuth(walletAddress)
+				setIsAuthenticated(false)
 			} else authenticateWallet()
 		}
 	}, [authenticateWallet, disconnecting, http, walletAddress])
