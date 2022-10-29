@@ -1,7 +1,6 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback } from 'react'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { PublicKey, Transaction } from '@solana/web3.js'
-import { WalletNotConnectedError } from '@solana/wallet-adapter-base'
 import { Authorization } from 'models/authorization'
 import { addAuthHeaders, removeAuthHeaders } from 'utils/http'
 import { lsGetWallet, lsRemoveWalletAuth, lsSetWallet } from 'utils/localStorage'
@@ -9,11 +8,11 @@ import { AxiosInstance } from 'axios'
 import bs58 from 'bs58'
 
 type Web3AuthHook = {
-	encodePassword: (oneTimePassword: string) => Promise<string>
-	requestPassword: () => Promise<string>
-	connectWallet: (encoding: string) => Promise<Authorization>
-	connect: () => Promise<Authorization>
-	autoconnect: () => Promise<boolean>
+	encodePassword: (oneTimePassword: string, publicKey: PublicKey) => Promise<string>
+	requestPassword: (walletAddress: string) => Promise<string>
+	connectWallet: (encoding: string, walletAddress: string) => Promise<Authorization>
+	connect: (publicKey: PublicKey) => Promise<Authorization>
+	autoconnect: (publicKey: PublicKey) => Promise<boolean>
 }
 
 /**
@@ -32,21 +31,21 @@ type Web3AuthHook = {
  * @returns functions to handle authenticating your wallet to the backend
  */
 export const useWeb3Auth = (http: AxiosInstance): Web3AuthHook => {
-	const { publicKey, signMessage, signTransaction, wallet } = useWallet()
+	const { signMessage, signTransaction, wallet } = useWallet()
 	const { connection } = useConnection()
-	const walletAddress = useMemo(() => publicKey?.toString() || '', [publicKey])
 
 	/** Initialize the login process by requesting a one time password */
-	const requestPassword = useCallback(async () => {
-		const response = await http.get<string>(`auth/wallet/request-password/${walletAddress}`)
-		return response.data
-	}, [http, walletAddress])
+	const requestPassword = useCallback(
+		async (walletAddress: string) => {
+			const response = await http.get<string>(`auth/wallet/request-password/${walletAddress}`)
+			return response.data
+		},
+		[http]
+	)
 
 	/** Encode the message string into a Message or Transaction object */
 	const encodePassword = useCallback(
-		async (password: string): Promise<string> => {
-			if (!publicKey) throw new WalletNotConnectedError()
-
+		async (password: string, publicKey: PublicKey): Promise<string> => {
 			const message = new TextEncoder().encode(password)
 
 			// If wallet supports message signing, go with that option
@@ -68,58 +67,70 @@ export const useWeb3Auth = (http: AxiosInstance): Web3AuthHook => {
 				return bs58.encode(signedTransaction.serialize())
 			} else throw new Error('Wallet does not support message or transaction signing!')
 		},
-		[connection, publicKey, signMessage, signTransaction, wallet?.adapter.name]
+		[connection, signMessage, signTransaction, wallet]
 	)
 
 	/** Send the encoded password to backend in an attempt to connect to the server */
 	const connectWallet = useCallback(
-		async (encoding: string) => {
+		async (encoding: string, walletAddress: string) => {
 			const response = await http.get<Authorization>(`auth/wallet/connect/${walletAddress}/${encoding}`)
 			return response.data
 		},
-		[http, walletAddress]
+		[http]
 	)
 
 	/** Refresh access token by using refresh token from the localStorage */
-	const refreshAccessToken = useCallback(async () => {
-		const lsWallet = lsGetWallet(walletAddress)
-		if (!lsWallet?.refreshToken) throw new Error('No refresh token found in local storage!')
+	const refreshAccessToken = useCallback(
+		async (walletAddress: string) => {
+			const lsWallet = lsGetWallet(walletAddress)
+			if (!lsWallet?.refreshToken) throw new Error('No refresh token found in local storage!')
 
-		const { data: accessToken } = await http.get<string>(`auth/wallet/refresh-token/${lsWallet.refreshToken}`)
-		addAuthHeaders(http, accessToken)
-		lsSetWallet(walletAddress, { accessToken })
+			const { data: accessToken } = await http.get<string>(`auth/wallet/refresh-token/${lsWallet.refreshToken}`)
+			addAuthHeaders(http, accessToken)
+			lsSetWallet(walletAddress, { accessToken })
 
-		return accessToken
-	}, [http, walletAddress])
+			return accessToken
+		},
+		[http]
+	)
 
 	// Try autoconnecting in case accessToken is preserved in the localStorage
-	const autoconnect = useCallback(async () => {
-		const lsWallet = lsGetWallet(walletAddress)
-		let isConnected = false
+	const autoconnect = useCallback(
+		async (publicKey: PublicKey) => {
+			const walletAddress = publicKey.toString()
+			const lsWallet = lsGetWallet(walletAddress)
+			let isConnected = false
 
-		// If auth token is preserved in the localStorage, refresh it
-		if (lsWallet?.accessToken) {
-			try {
-				addAuthHeaders(http, lsWallet.accessToken)
-				await refreshAccessToken()
-				isConnected = true
-			} catch (error) {
-				removeAuthHeaders(http)
-				lsRemoveWalletAuth(walletAddress)
-				isConnected = false
+			// If auth token is preserved in the localStorage, refresh it
+			if (lsWallet?.accessToken) {
+				try {
+					addAuthHeaders(http, lsWallet.accessToken)
+					await refreshAccessToken(walletAddress)
+					isConnected = true
+				} catch (error) {
+					removeAuthHeaders(http)
+					lsRemoveWalletAuth(walletAddress)
+					isConnected = false
+				}
 			}
-		}
 
-		return isConnected
-	}, [http, refreshAccessToken, walletAddress])
+			return isConnected
+		},
+		[http, refreshAccessToken]
+	)
 
-	const connect = useCallback(async () => {
-		const oneTimePassword = await requestPassword()
-		const encoding = await encodePassword(oneTimePassword)
-		const authorization = await connectWallet(encoding)
+	const connect = useCallback(
+		async (publicKey: PublicKey) => {
+			const walletAddress = publicKey.toString()
 
-		return authorization
-	}, [connectWallet, encodePassword, requestPassword])
+			const oneTimePassword = await requestPassword(walletAddress)
+			const encoding = await encodePassword(oneTimePassword, publicKey)
+			const authorization = await connectWallet(encoding, walletAddress)
+
+			return authorization
+		},
+		[connectWallet, encodePassword, requestPassword]
+	)
 
 	return { requestPassword, connectWallet, encodePassword, connect, autoconnect }
 }
