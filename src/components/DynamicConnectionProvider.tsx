@@ -57,3 +57,5 @@ export const DynamicConnectionProvider: React.FC<DynamicConnectionProviderProps>
 		</ConnectionContext.Provider>
 	)
 }
+
+export default DynamicConnectionProvider

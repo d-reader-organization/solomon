@@ -1,5 +1,5 @@
 import React from 'react'
-import useTokenGating from 'hooks/useTokenGating'
+import useTokenGating from '../hooks/useTokenGating'
 
 interface Props {
 	hashlist: string[]

@@ -13,12 +13,7 @@ import {
 import { toUint8Array } from 'js-base64'
 import { useCallback, useMemo } from 'react'
 import useSWR from 'swr'
-
-export type Account = Readonly<{
-	address: Base64EncodedAddress
-	label?: string
-	publicKey: PublicKey
-}>
+import { Account } from '../providers/MobileWalletProvider'
 
 type Authorization = Readonly<{
 	accounts: Account[]
@@ -56,12 +51,18 @@ function getAuthorizationFromAuthorizationResult(
 	}
 }
 
+function getUriForAppIdentity() {
+	const location = globalThis.location
+	if (location == null) return
+	return `${location.protocol}//${location.host}`
+}
+
 function getPublicKeyFromAddress(address: Base64EncodedAddress): PublicKey {
 	const publicKeyByteArray = toUint8Array(address)
 	return new PublicKey(publicKeyByteArray)
 }
 
-export type AuthorizationHook = {
+export type MobileAuthorizationHook = {
 	accounts: Account[] | null
 	authorizeSession: (wallet: AuthorizeAPI & ReauthorizeAPI) => Promise<Account>
 	deauthorizeSession: (wallet: DeauthorizeAPI) => Promise<void>
@@ -69,11 +70,12 @@ export type AuthorizationHook = {
 	selectedAccount: Account | null
 }
 
-export default function useMobileAuthorization(authorizeParams: {
+export const useMobileAuthorization = (authorizeParams: {
 	cluster: Cluster
 	identity: AppIdentity
-}): AuthorizationHook {
+}): MobileAuthorizationHook => {
 	const { data: authorization, mutate: setAuthorization } = useSWR<Authorization | null | undefined>('authorization')
+	const { cluster, identity } = authorizeParams
 
 	const handleAuthorizationResult = useCallback(
 		async (authorizationResult: AuthorizationResult): Promise<Authorization> => {
@@ -93,10 +95,18 @@ export default function useMobileAuthorization(authorizeParams: {
 				? wallet.reauthorize({
 						auth_token: authorization.authToken,
 				  })
-				: wallet.authorize(authorizeParams))
+				: wallet.authorize({
+						cluster,
+						identity: {
+							// generate uri if identity.uri is undefined or null
+							uri: identity.uri ?? getUriForAppIdentity(),
+							icon: identity.icon,
+							name: identity.name,
+						},
+				  }))
 			return (await handleAuthorizationResult(authorizationResult)).selectedAccount
 		},
-		[authorizeParams, authorization, handleAuthorizationResult]
+		[cluster, identity, authorization, handleAuthorizationResult]
 	)
 
 	const deauthorizeSession = useCallback(
@@ -136,3 +146,5 @@ export default function useMobileAuthorization(authorizeParams: {
 		[authorization, authorizeSession, deauthorizeSession, onChangeAccount]
 	)
 }
+
+export default useMobileAuthorization

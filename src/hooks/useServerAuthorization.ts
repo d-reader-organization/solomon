@@ -4,16 +4,18 @@ import { PublicKey, Transaction } from '@solana/web3.js'
 import { Authorization } from '../models/authorization'
 import { addAuthHeaders, removeAuthHeaders } from '../utils/http'
 import { lsGetWallet, lsRemoveWalletAuth, lsSetWallet } from '../utils/localStorage'
+import { Web3MobileWallet } from '@solana-mobile/mobile-wallet-adapter-protocol-web3js'
+import { Account } from '../providers/MobileWalletProvider'
 import { AxiosInstance } from 'axios'
 import bs58 from 'bs58'
-import { Web3MobileWallet } from '@solana-mobile/mobile-wallet-adapter-protocol-web3js'
 
 type Web3AuthHook = {
-	signPassword: (password: string, publicKey: PublicKey) => Promise<string>
-	mobileSignPassword: (password: string, address: string, wallet: Web3MobileWallet) => Promise<string>
-	requestPassword: (address: string) => Promise<string>
-	connectWallet: (encodedPassword: string, address: string) => Promise<Authorization>
+	// signPassword: (password: string, publicKey: PublicKey) => Promise<string>
+	// mobileSignPassword: (password: string, address: string, wallet: Web3MobileWallet) => Promise<string>
+	// requestPassword: (address: string) => Promise<string>
+	// serverConnect: (encodedPassword: string, address: string) => Promise<Authorization>
 	connect: (publicKey: PublicKey) => Promise<Authorization>
+	mobileConnect: (mobileWallet: Web3MobileWallet, account: Account) => Promise<Authorization>
 	autoconnect: (address: string) => Promise<boolean>
 }
 
@@ -89,7 +91,7 @@ export const useServerAuthorization = (http: AxiosInstance): Web3AuthHook => {
 	)
 
 	/** Send the encoded password to backend in an attempt to connect to the server */
-	const connectWallet = useCallback(
+	const serverConnect = useCallback(
 		async (encodedPassword: string, address: string) => {
 			const response = await http.get<Authorization>(`auth/wallet/connect/${address}/${encodedPassword}`)
 			lsSetWallet(address, response.data)
@@ -142,15 +144,27 @@ export const useServerAuthorization = (http: AxiosInstance): Web3AuthHook => {
 		async (publicKey: PublicKey) => {
 			const address = publicKey.toString()
 
+			// Try catch and remove authorization in case of a fail
 			const oneTimePassword = await requestPassword(address)
 			const encodedPassword = await signPassword(oneTimePassword, publicKey)
-			const authentication = await connectWallet(encodedPassword, address)
+			const authentication = await serverConnect(encodedPassword, address)
 			return authentication
 		},
-		[connectWallet, signPassword, requestPassword]
+		[serverConnect, signPassword, requestPassword]
 	)
 
-	return { requestPassword, connectWallet, signPassword, mobileSignPassword, connect, autoconnect }
+	const mobileConnect = useCallback(
+		async (mobileWallet: Web3MobileWallet, account: Account) => {
+			// Try catch and remove authorization in case of a fail
+			const oneTimePassword = await requestPassword(account.publicKey.toString())
+			const encodedPassword = await mobileSignPassword(oneTimePassword, account.address, mobileWallet)
+			const authentication = await serverConnect(encodedPassword, account.publicKey.toString())
+			return authentication
+		},
+		[requestPassword, mobileSignPassword, serverConnect]
+	)
+
+	return { connect, mobileConnect, autoconnect }
 }
 
 export default useServerAuthorization

@@ -9,7 +9,7 @@ export function sleep(ms: number): Promise<void> {
  */
 export const shortenString = (string: string, slice = 4): string => {
 	if (string.length < slice * 2 + 3) return string
-	return `${string.slice(0, slice)}...${string.slice(-slice)}`
+	return `${string.slice(0, slice)}..${string.slice(-slice)}`
 }
 
 export const getUnixTimeInSeconds = () => {
