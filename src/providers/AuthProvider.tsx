@@ -1,98 +1,144 @@
 import React, { useMemo, createContext, useContext, useEffect, useState, useCallback } from 'react'
-import { lsRemoveWalletAuth, lsSetWallet } from 'utils/localStorage'
-import { addAuthHeaders, removeAuthHeaders } from 'utils/http'
+import { lsRemoveWalletAuth } from '../utils/localStorage'
+import { removeAuthHeaders } from '../utils/http'
+import { AppIdentity, Base64EncodedAddress, Cluster } from '@solana-mobile/mobile-wallet-adapter-protocol'
 import { useWallet } from '@solana/wallet-adapter-react'
-import useWeb3Auth from 'hooks/useWeb3Auth'
-import { AxiosInstance } from 'axios'
+import { SolanaMobileWalletAdapterWalletName } from '@solana-mobile/wallet-adapter-mobile'
+import useMobileAuthorization, { AuthorizationHook } from '../hooks/useMobileAuthorization'
+import useServerAuthorization from '../hooks/useServerAuthorization'
+import axios, { AxiosInstance } from 'axios'
 import { PublicKey } from '@solana/web3.js'
 
 interface AuthContextState {
 	isAuthenticated: boolean
 	isAuthenticating: boolean
-	authenticateWallet: (publicKey: PublicKey) => Promise<void>
+	setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>
+	setIsAuthenticating: React.Dispatch<React.SetStateAction<boolean>>
+	mobileAuthorization: AuthorizationHook
+	walletAccount: WalletAccount | undefined
+	isMobileWallet: boolean
+	http: AxiosInstance
+}
+
+const defaultAccount = {
+	address: PublicKey.default.toString(),
+	label: '',
+	publicKey: PublicKey.default,
 }
 
 const initialContextValue = {
 	isAuthenticated: false,
 	isAuthenticating: false,
-	authenticateWallet: async () => {},
+	setIsAuthenticated: () => {},
+	setIsAuthenticating: () => {},
+	mobileAuthorization: {
+		accounts: [],
+		authorizeSession: async () => defaultAccount,
+		deauthorizeSession: async () => {},
+		onChangeAccount: async () => {},
+		selectedAccount: defaultAccount,
+	},
+	walletAccount: {
+		address: PublicKey.default.toString(),
+		publicKey: PublicKey.default,
+	},
+	isMobileWallet: false,
+	http: axios.create(),
 }
 
 export const AuthContext = createContext<AuthContextState>(initialContextValue)
 
 interface Props {
 	http: AxiosInstance
+	cluster: Cluster
+	identity: AppIdentity
 	children: React.ReactNode
 }
 
-const AuthProvider: React.FC<Props> = ({ http, children }) => {
+interface WalletAccount {
+	publicKey: PublicKey
+	address: Base64EncodedAddress
+}
+
+const AuthProvider: React.FC<Props> = ({ http, cluster, identity, children }) => {
 	const [isAuthenticating, setIsAuthenticating] = useState(false)
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
-	const { autoconnect, connect } = useWeb3Auth(http)
+	const mobileAuthorization = useMobileAuthorization({ cluster, identity })
+	const serverAuthorization = useServerAuthorization(http)
 	const { wallet } = useWallet()
-	// TODO: const toaster = useToaster() or throw errors properly
 
-	const authenticateWallet = useCallback(
-		async (publicKey: PublicKey) => {
+	const serverAutoconnect = serverAuthorization.autoconnect
+	const serverConnect = serverAuthorization.connect
+
+	// TODO: const toaster = useToaster() or throw errors properly
+	// const isMobileWallet = wallet?.adapter.name === SolanaMobileWalletAdapterWalletName;
+	const isMobileWallet = useMemo(
+		() => wallet?.adapter.name === SolanaMobileWalletAdapterWalletName,
+		[wallet?.adapter.name]
+	)
+
+	/** TODO: Make this a CrossPlatformWallet (something like AnchorWallet) */
+	const walletAccount: WalletAccount | undefined = useMemo(() => {
+		const publicKey = wallet?.adapter.publicKey ?? mobileAuthorization.selectedAccount?.publicKey
+		const address = wallet?.adapter.publicKey?.toString() ?? mobileAuthorization.selectedAccount?.address
+
+		if (publicKey && address) return { publicKey, address }
+		else return undefined
+	}, [wallet?.adapter.publicKey, mobileAuthorization.selectedAccount])
+
+	// Authenticate on server
+	const authenticate = useCallback(
+		async (account: WalletAccount) => {
 			// Try autoconnecting
-			const isConnected = await autoconnect(publicKey)
+			const isConnected = await serverAutoconnect(account.address)
 
 			// Start manual authentication process in case autoconnection failed
-			if (!isConnected) {
+			// Don't start manual authentication if it's mobile wallet adapter
+			if (!isConnected && !isMobileWallet) {
 				setIsAuthenticating(true)
 
 				try {
-					const authentication = await connect(publicKey)
-					lsSetWallet(publicKey.toString(), authentication)
-					addAuthHeaders(http, authentication.accessToken)
+					await serverConnect(account.publicKey)
 					setIsAuthenticated(true)
 				} catch (error) {
 					// const message = queryError(error)
 					// toaster.add(message, 'error')
 					removeAuthHeaders(http)
-					lsRemoveWalletAuth(publicKey.toString())
+					lsRemoveWalletAuth(account.address)
 				} finally {
 					setIsAuthenticating(false)
 				}
-			} else setIsAuthenticated(true)
+			} else setIsAuthenticated(isConnected)
 		},
-		[autoconnect, connect, http]
+		[http, isMobileWallet, serverAutoconnect, serverConnect]
 	)
 
+	// Try to authenticate whenever wallet account is (re)defined
 	useEffect(() => {
-		if (
-			wallet?.adapter.connected &&
-			!wallet?.adapter.connecting &&
-			wallet.adapter.publicKey &&
-			wallet.readyState === 'Installed'
-		) {
-			authenticateWallet(wallet.adapter.publicKey)
-		}
-	}, [authenticateWallet, wallet])
-
-	useEffect(() => {
-		if (wallet) {
-			function handleDisconnect() {
-				removeAuthHeaders(http)
-				if (wallet?.adapter.publicKey) {
-					lsRemoveWalletAuth(wallet.adapter.publicKey?.toString())
-				}
-				setIsAuthenticated(false)
-			}
-			wallet.adapter.on('disconnect', handleDisconnect)
-			// wallet.adapter.on('connect', authenticateWallet);
-			return () => {
-				wallet.adapter.off('disconnect', handleDisconnect)
-				// wallet.adapter.off('connect', authenticateWallet);
-			}
-		}
-
-		return
-	}, [authenticateWallet, http, wallet])
+		if (walletAccount) authenticate(walletAccount)
+	}, [walletAccount, authenticate])
 
 	const value = useMemo(
-		() => ({ isAuthenticated, isAuthenticating, authenticateWallet }),
-		[isAuthenticated, isAuthenticating, authenticateWallet]
+		() => ({
+			isAuthenticated,
+			isAuthenticating,
+			setIsAuthenticating,
+			setIsAuthenticated,
+			mobileAuthorization,
+			walletAccount,
+			isMobileWallet,
+			http,
+		}),
+		[
+			isAuthenticated,
+			isAuthenticating,
+			setIsAuthenticating,
+			setIsAuthenticated,
+			mobileAuthorization,
+			walletAccount,
+			isMobileWallet,
+			http,
+		]
 	)
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

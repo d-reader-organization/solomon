@@ -22,5 +22,8 @@ export * from './useToggle'
 export { default as useCountdown } from './useCountdown'
 export * from './useCountdown'
 
-export { default as useWeb3Auth } from './useWeb3Auth'
-export * from './useWeb3Auth'
+export { default as useMobileAuthorization } from './useMobileAuthorization'
+export * from './useMobileAuthorization'
+
+export { default as useServerAuthorization } from './useServerAuthorization'
+export * from './useServerAuthorization'

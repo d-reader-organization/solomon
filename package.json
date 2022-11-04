@@ -1,6 +1,6 @@
 {
 	"name": "@open-sauce/solomon",
-	"version": "0.1.13",
+	"version": "0.1.14",
 	"description": "Utility library for frontend dapps built on Solana",
 	"homepage": "https://github.com/open-sauce-labs/solomon",
 	"license": "MIT",
@@ -66,21 +66,36 @@
 			"last 1 safari version"
 		]
 	},
+	"overrides": {
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0"
+	},
 	"peerDependencies": {
 		"@mui/material": "^5.10.11",
+		"@solana-mobile/mobile-wallet-adapter-protocol": "^0.9.8",
+		"@solana-mobile/mobile-wallet-adapter-protocol-web3js": "^0.9.8",
+		"@solana-mobile/wallet-adapter-mobile": "^0.9.8",
 		"@solana/spl-token": "^0.3.6",
 		"@solana/wallet-adapter-base": "^0.9.18",
+		"@solana/wallet-adapter-material-ui": "^0.16.20",
 		"@solana/wallet-adapter-react": "^0.15.22",
 		"@solana/wallet-adapter-wallets": "^0.19.5",
 		"@solana/web3.js": "^1.66.2",
 		"axios": "^1.1.3",
 		"bs58": "^5.0.0",
+		"js-base64": "^3.7.2",
 		"react": "^18.2.0",
-		"react-dom": "^18.2.0"
+		"react-dom": "^18.2.0",
+		"swr": "^1.3.0"
 	},
 	"devDependencies": {
+		"@mui/material": "^5.10.11",
+		"@solana-mobile/mobile-wallet-adapter-protocol": "^0.9.8",
+		"@solana-mobile/mobile-wallet-adapter-protocol-web3js": "^0.9.8",
+		"@solana-mobile/wallet-adapter-mobile": "^0.9.8",
 		"@solana/spl-token": "^0.3.6",
 		"@solana/wallet-adapter-base": "^0.9.18",
+		"@solana/wallet-adapter-material-ui": "^0.16.20",
 		"@solana/wallet-adapter-react": "^0.15.22",
 		"@solana/wallet-adapter-wallets": "^0.19.5",
 		"@solana/web3.js": "^1.66.2",
@@ -103,9 +118,11 @@
 		"eslint-plugin-prettier": "^4.2.1",
 		"eslint-plugin-react": "^7.31.10",
 		"eslint-plugin-react-hooks": "^4.6.0",
+		"js-base64": "^3.7.2",
 		"prettier": "^2.7.1",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
+		"swr": "^1.3.0",
 		"tsc-alias": "^1.7.0",
 		"typescript": "^4.8.4"
 	}
