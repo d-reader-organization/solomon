@@ -1,6 +1,6 @@
 {
 	"name": "@open-sauce/solomon",
-	"version": "0.1.14",
+	"version": "0.1.15",
 	"description": "Utility library for frontend dapps built on Solana",
 	"homepage": "https://github.com/open-sauce-labs/solomon",
 	"license": "MIT",
@@ -65,10 +65,6 @@
 			"last 1 firefox version",
 			"last 1 safari version"
 		]
-	},
-	"overrides": {
-		"react": "^18.2.0",
-		"react-dom": "^18.2.0"
 	},
 	"peerDependencies": {
 		"@mui/material": "^5.10.11",
