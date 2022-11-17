@@ -100,6 +100,26 @@ const AuthProvider: React.FC<Props> = ({ http, cluster, identity, children }) =>
 		if (walletAccount) authenticate(walletAccount)
 	}, [walletAccount, authenticate])
 
+	// TODO: Make sure autoconnect and refresh-token work as intended
+
+	useEffect(() => {
+		if (wallet) {
+			function handleDisconnect() {
+				removeAuthHeaders(http)
+				if (wallet?.adapter.publicKey) {
+					lsRemoveWalletAuth(wallet.adapter.publicKey?.toString())
+				}
+				setIsAuthenticated(false)
+			}
+			wallet.adapter.on('disconnect', handleDisconnect)
+			return () => {
+				wallet.adapter.off('disconnect', handleDisconnect)
+			}
+		}
+
+		return
+	}, [authenticate, http, wallet])
+
 	const value = useMemo(
 		() => ({
 			isAuthenticated,
@@ -112,19 +132,6 @@ const AuthProvider: React.FC<Props> = ({ http, cluster, identity, children }) =>
 		}),
 		[isAuthenticated, isAuthenticating, setIsAuthenticating, setIsAuthenticated, walletAccount, isMobileWallet, http]
 	)
-
-	// TODO: Make sure autoconnect and refresh-token work as intended
-	// TODO: Make sure disconnect works as intended
-	// const handleDisconnect = useCallback(
-	// 	(publicKey?: PublicKey) => {
-	// 		removeAuthHeaders(http)
-	// 		if (publicKey) {
-	// 			lsRemoveWalletAuth(publicKey.toString())
-	// 		}
-	// 		setIsAuthenticated(false)
-	// 	},
-	// 	[http]
-	// )
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

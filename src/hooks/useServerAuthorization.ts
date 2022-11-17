@@ -96,6 +96,7 @@ export const useServerAuthorization = (http: AxiosInstance): Web3AuthHook => {
 			const response = await http.get<Authorization>(`auth/wallet/connect/${address}/${encodedPassword}`)
 			lsSetWallet(address, response.data)
 			addAuthHeaders(http, response.data.accessToken)
+			// TODO: setIsAuthenticated(true)
 			return response.data
 		},
 		[http]
