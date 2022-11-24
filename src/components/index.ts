@@ -18,3 +18,6 @@ export * from './MobileWalletDisconnectButton'
 
 export { default as MobileWalletMultiButton } from './MobileWalletMultiButton'
 export * from './MobileWalletMultiButton'
+
+export { default as CrossDeviceWalletMultiButton } from './CrossDeviceWalletMultiButton'
+export * from './CrossDeviceWalletMultiButton'

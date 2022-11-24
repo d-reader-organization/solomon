@@ -46,7 +46,7 @@ interface WalletAccount {
 	address: Base64EncodedAddress
 }
 
-const AuthProvider: React.FC<Props> = ({ http, cluster, identity, children }) => {
+export const AuthProvider: React.FC<Props> = ({ http, cluster, identity, children }) => {
 	const [isAuthenticating, setIsAuthenticating] = useState(false)
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
 	const { selectedAccount } = useMobileAuthorization({ cluster, identity })
