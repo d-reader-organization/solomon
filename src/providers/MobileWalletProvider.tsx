@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useMemo, type ReactNode } from 'react'
 import { AppIdentity, Cluster, Base64EncodedAddress } from '@solana-mobile/mobile-wallet-adapter-protocol'
-import { MobileAuthorizationHook, useMobileAuthorization } from '../hooks'
+import { useMobileAuthorization, MobileAuthorizationHook } from 'hooks/useMobileAuthorization'
 import { PublicKey } from '@solana/web3.js'
 
 export type Account = Readonly<{

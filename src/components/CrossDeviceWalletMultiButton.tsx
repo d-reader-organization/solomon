@@ -8,15 +8,19 @@ import { MobileWalletDisconnectButtonProps } from './MobileWalletDisconnectButto
 
 export type CrossDeviceWalletMultiButtonProps = MobileWalletConnectButtonProps & MobileWalletDisconnectButtonProps
 
-const CrossDeviceWalletMultiButton: React.FC<CrossDeviceWalletMultiButtonProps> = ({ onAuthorize, onDeauthorize }) => {
+const CrossDeviceWalletMultiButton: React.FC<CrossDeviceWalletMultiButtonProps> = ({
+	onAuthorize,
+	onDeauthorize,
+	...props
+}) => {
 	const { wallet } = useWallet()
 	const isMobileWallet = wallet?.adapter.name === SolanaMobileWalletAdapterWalletName
 
 	if (isMobileWallet) {
-		return <MobileWalletMultiButton onAuthorize={onAuthorize} onDeauthorize={onDeauthorize} />
+		return <MobileWalletMultiButton onAuthorize={onAuthorize} onDeauthorize={onDeauthorize} {...props} />
 	}
 
-	return <WalletMultiButton variant='contained' />
+	return <WalletMultiButton variant='contained' {...props} />
 }
 
 export default CrossDeviceWalletMultiButton

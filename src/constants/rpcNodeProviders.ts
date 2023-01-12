@@ -11,6 +11,10 @@ const mainnetRpcNodeProviders: RpcNodeProvider[] = [
 		endpoint: 'https://rpc.ankr.com/solana',
 	},
 	{
+		name: 'Holaplex',
+		endpoint: 'https://holaplex.rpcpool.com',
+	},
+	{
 		name: 'Metaplex',
 		endpoint: 'https://api.metaplex.solana.com',
 	},

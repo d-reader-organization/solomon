@@ -1,13 +1,13 @@
 import React, { useMemo, createContext, useContext, useEffect, useState, useCallback } from 'react'
-import { lsRemoveWalletAuth } from '../utils/localStorage'
-import { removeAuthHeaders } from '../utils/http'
 import { AppIdentity, Base64EncodedAddress, Cluster } from '@solana-mobile/mobile-wallet-adapter-protocol'
-import { useWallet } from '@solana/wallet-adapter-react'
 import { SolanaMobileWalletAdapterWalletName } from '@solana-mobile/wallet-adapter-mobile'
-import useMobileAuthorization from '../hooks/useMobileAuthorization'
-import useServerAuthorization from '../hooks/useServerAuthorization'
-import axios, { AxiosInstance } from 'axios'
+import useMobileAuthorization from 'hooks/useMobileAuthorization'
+import useServerAuthorization from 'hooks/useServerAuthorization'
+import { lsRemoveWalletAuth } from 'utils/localStorage'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { PublicKey } from '@solana/web3.js'
+import axios, { AxiosInstance } from 'axios'
+import { removeAuthHeaders } from 'utils/http'
 
 interface AuthContextState {
 	isAuthenticated: boolean
@@ -22,8 +22,12 @@ interface AuthContextState {
 const initialContextValue = {
 	isAuthenticated: false,
 	isAuthenticating: false,
-	setIsAuthenticated: () => {},
-	setIsAuthenticating: () => {},
+	setIsAuthenticated: () => {
+		return
+	},
+	setIsAuthenticating: () => {
+		return
+	},
 	walletAccount: {
 		address: PublicKey.default.toString(),
 		publicKey: PublicKey.default,
@@ -51,7 +55,7 @@ export const AuthProvider: React.FC<Props> = ({ http, cluster, identity, childre
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
 	const { selectedAccount } = useMobileAuthorization({ cluster, identity })
 	const serverAuthorization = useServerAuthorization(http)
-	const { wallet } = useWallet()
+	const { wallet, disconnecting, publicKey } = useWallet()
 
 	const isMobileWallet = wallet?.adapter.name === SolanaMobileWalletAdapterWalletName
 	const serverAutoconnect = serverAuthorization.autoconnect
@@ -61,10 +65,10 @@ export const AuthProvider: React.FC<Props> = ({ http, cluster, identity, childre
 
 	/** TODO: Make this a CrossPlatformWallet (something like AnchorWallet) */
 	const walletAccount: WalletAccount | undefined = useMemo(() => {
-		const publicKey = wallet?.adapter.publicKey ?? selectedAccount?.publicKey
+		const pubKey = wallet?.adapter.publicKey ?? selectedAccount?.publicKey
 		const address = wallet?.adapter.publicKey?.toString() ?? selectedAccount?.address
 
-		if (publicKey && address) return { publicKey, address }
+		if (pubKey && address) return { publicKey: pubKey, address }
 		else return undefined
 	}, [wallet?.adapter.publicKey, selectedAccount])
 
@@ -72,7 +76,7 @@ export const AuthProvider: React.FC<Props> = ({ http, cluster, identity, childre
 	const authenticate = useCallback(
 		async (account: WalletAccount) => {
 			// Try autoconnecting
-			const isConnected = await serverAutoconnect(account.address)
+			const isConnected = await serverAutoconnect(account.publicKey.toString())
 
 			// Start manual authentication process in case autoconnection failed
 			// Don't start manual authentication if it's mobile wallet adapter
@@ -90,7 +94,9 @@ export const AuthProvider: React.FC<Props> = ({ http, cluster, identity, childre
 				} finally {
 					setIsAuthenticating(false)
 				}
-			} else setIsAuthenticated(isConnected)
+			} else if (!isMobileWallet) {
+				setIsAuthenticated(isConnected)
+			}
 		},
 		[http, isMobileWallet, serverAutoconnect, serverConnect]
 	)
@@ -100,25 +106,16 @@ export const AuthProvider: React.FC<Props> = ({ http, cluster, identity, childre
 		if (walletAccount) authenticate(walletAccount)
 	}, [walletAccount, authenticate])
 
-	// TODO: Make sure autoconnect and refresh-token work as intended
-
+	// Clear http headers and localStorage when disconnecting
 	useEffect(() => {
-		if (wallet) {
-			function handleDisconnect() {
-				removeAuthHeaders(http)
-				if (wallet?.adapter.publicKey) {
-					lsRemoveWalletAuth(wallet.adapter.publicKey?.toString())
-				}
-				setIsAuthenticated(false)
-			}
-			wallet.adapter.on('disconnect', handleDisconnect)
-			return () => {
-				wallet.adapter.off('disconnect', handleDisconnect)
-			}
+		if (publicKey && disconnecting) {
+			removeAuthHeaders(http)
+			lsRemoveWalletAuth(publicKey.toString())
+			setIsAuthenticated(false)
 		}
+	}, [disconnecting, publicKey, http])
 
-		return
-	}, [authenticate, http, wallet])
+	// TODO: Make sure autoconnect and refresh-token work as intended
 
 	const value = useMemo(
 		() => ({
