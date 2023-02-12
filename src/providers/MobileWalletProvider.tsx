@@ -9,7 +9,7 @@ export type Account = Readonly<{
 	publicKey: PublicKey
 }>
 
-interface MobileWalletContextState extends MobileAuthorizationHook {
+export type MobileWalletContextState = MobileAuthorizationHook & {
 	cluster: Cluster
 	identity: AppIdentity
 }
