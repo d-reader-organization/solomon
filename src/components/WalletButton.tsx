@@ -1,9 +1,9 @@
 import React from 'react'
 import { Web3MobileWallet } from '@solana-mobile/mobile-wallet-adapter-protocol-web3js'
 import CrossDeviceWalletMultiButton, { CrossDeviceWalletMultiButtonProps } from './CrossDeviceWalletMultiButton'
-import { useServerAuthorization } from 'hooks'
-import { Account, useAuth } from 'providers'
-import { lsRemoveWalletAuth, removeAuthHeaders } from 'utils'
+import { useServerAuthorization } from '../hooks'
+import { Account, useAuth } from '../providers'
+import { lsRemoveWalletAuth, removeAuthHeaders } from '../utils'
 import { AxiosInstance } from 'axios'
 
 type Props = {

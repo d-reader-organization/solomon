@@ -1,7 +1,7 @@
 import React from 'react'
 import { FormControl, InputLabel, MenuItem, Select, Box, SelectProps } from '@mui/material'
-import { RpcNodeProvider } from 'constants/rpcNodeProviders'
-import { useWindowScrollPositions } from 'hooks'
+import { RpcNodeProvider } from '../constants/rpcNodeProviders'
+import { useWindowScrollPositions } from '../hooks'
 
 interface Props extends SelectProps<string> {
 	options: RpcNodeProvider[]

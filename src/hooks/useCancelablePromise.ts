@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import useIsMounted from 'hooks/useIsMounted'
+import useIsMounted from '../hooks/useIsMounted'
 
 export const useCancelablePromise = () => {
 	const isMounted = useIsMounted()

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { ParsedAccountData } from '@solana/web3.js'
-import { useCancelablePromise } from 'hooks'
+import { useCancelablePromise } from '../hooks'
 
 type TokenGatingHook = (hashlist: string[]) => boolean
 

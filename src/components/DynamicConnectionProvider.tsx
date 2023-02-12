@@ -2,9 +2,9 @@ import React, { ReactNode, useCallback, useEffect, useState } from 'react'
 import type { ConnectionConfig } from '@solana/web3.js'
 import { Connection } from '@solana/web3.js'
 import { ConnectionContext } from '@solana/wallet-adapter-react'
-import { RpcNodeProvider } from 'constants/rpcNodeProviders'
+import { RpcNodeProvider } from '../constants/rpcNodeProviders'
 import { SelectChangeEvent } from '@mui/material'
-import { useCancelablePromise, useIsMounted } from 'hooks'
+import { useCancelablePromise, useIsMounted } from '../hooks'
 import RpcEndpointSelect from './RpcEndpointSelect'
 
 export interface DynamicConnectionProviderProps {

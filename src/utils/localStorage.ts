@@ -1,4 +1,4 @@
-import { Authorization } from 'models/authorization'
+import { Authorization } from '../models/authorization'
 
 /**
  * This can be expanded to support additional wallet configuration.
