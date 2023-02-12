@@ -65,24 +65,6 @@ export const MobileWalletMultiButton: FC<MobileWalletMultiButtonProps> = ({
 		return shortenString(base58, 4)
 	}, [children, wallet, base58])
 
-	/** @deprecated
-	 * No actual need for this since mobile wallet adapter will
-	 * pretty much always get detected.
-	 *
-	 * If wallet is not defined, it's better to have a 'Connect' button
-	 * Rather than a 'Select Wallet' button like we would have on desktop.
-	 */
-
-	/**
-	 *if (!wallet) {
-	 *		return (
-	 *			<WalletDialogButton color={color} variant={variant} type={type} {...props}>
-	 *				{children}
-	 *			</WalletDialogButton>
-	 *		)
-	 *	}
-	 */
-
 	if (!base58) {
 		return (
 			<MobileWalletConnectButton color={color} variant={variant} type={type} onAuthorize={onAuthorize} {...props}>
