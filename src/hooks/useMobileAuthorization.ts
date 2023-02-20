@@ -143,7 +143,7 @@ export const useMobileAuthorization = (authorizeParams: {
 			onChangeAccount,
 			selectedAccount: authorization?.selectedAccount ?? null,
 		}),
-		[authorization, authorizeSession, deauthorizeSession, onChangeAccount]
+		[authorization?.accounts, authorization?.selectedAccount, authorizeSession, deauthorizeSession, onChangeAccount]
 	)
 }
 

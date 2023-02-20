@@ -27,3 +27,6 @@ export * from './useMobileAuthorization'
 
 export { default as useServerAuthorization } from './useServerAuthorization'
 export * from './useServerAuthorization'
+
+export { default as useCrossDeviceWallet } from './useCrossDeviceWallet'
+export * from './useCrossDeviceWallet'
