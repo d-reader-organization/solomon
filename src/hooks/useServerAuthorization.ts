@@ -41,7 +41,7 @@ export const useServerAuthorization = (http: AxiosInstance): Web3AuthHook => {
 	/** Initialize the login process by requesting a one time password */
 	const requestPassword = useCallback(
 		async (address: string) => {
-			const response = await http.get<string>(`auth/wallet/request-password/${address}`)
+			const response = await http.patch<string>(`auth/wallet/request-password/${address}`)
 			return response.data
 		},
 		[http]
