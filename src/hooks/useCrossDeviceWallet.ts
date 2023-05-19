@@ -2,8 +2,49 @@ import { useCallback } from 'react'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { Transaction } from '@solana/web3.js'
 import { SolanaMobileWalletAdapterWalletName } from '@solana-mobile/wallet-adapter-mobile'
-import { useMobileWallet } from 'providers'
+import { useMobileWallet } from '../providers'
 import { WalletName } from '@solana/wallet-adapter-base'
+
+// https://discord.com/channels/988649555283308564/1103060569394786384
+/*
+const anchorWallet = {
+  signTransaction: async (transaction: Transaction) => {
+    const signedTransaction: Transaction = await transact(async wallet => {
+      // Request for authorization
+      await authorizeSession(wallet);
+
+      // Construct a transaction then request for signing
+      const transactions: Transaction[] = await wallet.signTransactions({
+        transactions: [yourProgramTransaction],
+      });
+
+      return transactions[0];
+    });
+    return signedTransaction;
+  },
+  signAllTransactions: async (transactions: Transaction[]) => {
+    const signedTransactions: Transaction = await transact(async wallet => {
+      // Request for authorization
+      await authorizeSession(wallet);
+
+      // Construct a transaction then request for signing
+      const transactions: Transaction[] = await wallet.signTransactions({
+        transactions: [
+          yourProgramTransaction1,
+          yourProgramTransaction2,
+          yourProgramTransaction3,
+        ],
+      });
+
+      return transactions;
+    });
+    return signedTransactions;
+  },
+  get publicKey() {
+    return account.publicKey; // insert however you store/get the publicKey here
+  },
+} as Wallet;
+*/
 
 type CrossDeviceWalletHook = {
 	signMessage: (message: Uint8Array) => Promise<Uint8Array>

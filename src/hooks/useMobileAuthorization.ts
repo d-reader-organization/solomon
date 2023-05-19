@@ -94,6 +94,12 @@ export const useMobileAuthorization = (authorizeParams: {
 			const authorizationResult = await (authorization
 				? wallet.reauthorize({
 						auth_token: authorization.authToken,
+						identity: {
+							// generate uri if identity.uri is undefined or null
+							uri: identity.uri ?? getUriForAppIdentity(),
+							icon: identity.icon,
+							name: identity.name,
+						},
 				  })
 				: wallet.authorize({
 						cluster,

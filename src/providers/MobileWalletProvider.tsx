@@ -49,7 +49,7 @@ export interface MobileWalletProviderProps {
 	// autoConnect?: boolean
 }
 
-export function MobileWalletProvider({ children, cluster, identity }: MobileWalletProviderProps) {
+export const MobileWalletProvider: React.FC<MobileWalletProviderProps> = ({ children, cluster, identity }) => {
 	const authorization = useMobileAuthorization({ cluster, identity })
 	const { selectedAccount, authorizeSession } = authorization
 	const { connection } = useConnection()
