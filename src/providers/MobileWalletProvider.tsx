@@ -15,7 +15,8 @@ export type MobileWalletContextState = MobileAuthorizationHook & {
 	cluster: Cluster
 	identity: AppIdentity
 	signMessage: (message: Uint8Array) => Promise<Uint8Array>
-	signTransaction: (transaction: Transaction) => Promise<Transaction>
+	signTransaction: (transactions: Transaction) => Promise<Transaction>
+	signTransactions: (transaction: Transaction[]) => Promise<Transaction[]>
 	signAndSendTransaction: (transaction: Transaction) => Promise<string>
 }
 
@@ -30,6 +31,7 @@ const initialContextValue: MobileWalletContextState = {
 	onChangeAccount: () => {},
 	signMessage: async () => Uint8Array.from([]),
 	signTransaction: async () => new Transaction(),
+	signTransactions: async ([]) => [new Transaction()],
 	signAndSendTransaction: async () => '',
 	selectedAccount: null,
 	cluster: 'devnet',
@@ -87,6 +89,21 @@ export const MobileWalletProvider: React.FC<MobileWalletProviderProps> = ({ chil
 		[authorizeSession]
 	)
 
+	const signTransactions = useCallback(
+		async (transactions: Transaction[]) => {
+			return transact(async (mobileWallet) => {
+				await authorizeSession(mobileWallet)
+
+				const signedTransactions = await mobileWallet.signTransactions({
+					transactions,
+				})
+
+				return signedTransactions
+			})
+		},
+		[authorizeSession]
+	)
+
 	const signAndSendTransaction = useCallback(
 		async (transaction: Transaction) => {
 			return transact(async (mobileWallet) => {
@@ -110,8 +127,16 @@ export const MobileWalletProvider: React.FC<MobileWalletProviderProps> = ({ chil
 	)
 
 	const value = useMemo(
-		() => ({ signMessage, signTransaction, signAndSendTransaction, ...authorization, cluster, identity }),
-		[authorization, signAndSendTransaction, signMessage, signTransaction, cluster, identity]
+		() => ({
+			signMessage,
+			signTransaction,
+			signTransactions,
+			signAndSendTransaction,
+			...authorization,
+			cluster,
+			identity,
+		}),
+		[authorization, signAndSendTransaction, signMessage, signTransaction, signTransactions, cluster, identity]
 	)
 
 	return <MobileWalletContext.Provider value={value}>{children}</MobileWalletContext.Provider>

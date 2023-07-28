@@ -49,13 +49,19 @@ const anchorWallet = {
 type CrossDeviceWalletHook = {
 	signMessage: (message: Uint8Array) => Promise<Uint8Array>
 	signTransaction: (transaction: Transaction) => Promise<Transaction>
+	signAllTransactions: (transactions: Transaction[]) => Promise<Transaction[]>
 	signAndSendTransaction: (transaction: Transaction) => Promise<string>
 	walletName: WalletName<string> | undefined
 	isMobileWallet: boolean
 }
 
 export const useCrossDeviceWallet = (): CrossDeviceWalletHook => {
-	const { signTransaction: walletSignTransaction, signMessage: walletSignMessage, wallet } = useWallet()
+	const {
+		signTransaction: walletSignTransaction,
+		signMessage: walletSignMessage,
+		signAllTransactions: walletSignAllTransactions,
+		wallet,
+	} = useWallet()
 	const mobileWallet = useMobileWallet()
 	const { connection } = useConnection()
 
@@ -91,6 +97,21 @@ export const useCrossDeviceWallet = (): CrossDeviceWalletHook => {
 		[isMobileWallet, mobileWallet, walletSignTransaction]
 	)
 
+	const signAllTransactions = useCallback(
+		async (transactions: Transaction[]) => {
+			// TODO: check if blockhash info is missing and fetch it if yes
+			if (isMobileWallet) {
+				return await mobileWallet.signTransactions(transactions)
+			} else {
+				if (!walletSignAllTransactions) {
+					throw new Error('Wallet does not support transaction signing!')
+				}
+				return await walletSignAllTransactions(transactions)
+			}
+		},
+		[isMobileWallet, mobileWallet, walletSignAllTransactions]
+	)
+
 	const signAndSendTransaction = useCallback(
 		async (transaction: Transaction) => {
 			const signedTransaction = await signTransaction(transaction)
@@ -101,7 +122,7 @@ export const useCrossDeviceWallet = (): CrossDeviceWalletHook => {
 		[connection, signTransaction]
 	)
 
-	return { signMessage, signTransaction, signAndSendTransaction, walletName, isMobileWallet }
+	return { signMessage, signTransaction, signAllTransactions, signAndSendTransaction, walletName, isMobileWallet }
 }
 
 export default useCrossDeviceWallet

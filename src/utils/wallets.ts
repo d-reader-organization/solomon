@@ -2,6 +2,12 @@
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare'
 import { phantomLedger } from '../constants/phantomLedgerAdapter'
+// import {
+// 	SolanaMobileWalletAdapter,
+// 	createDefaultAddressSelector,
+// 	createDefaultAuthorizationResultCache,
+// 	createDefaultWalletNotFoundHandler,
+// } from '@solana-mobile/wallet-adapter-mobile'
 
 export const getWallets = (network: WalletAdapterNetwork) => {
 	if (typeof window === 'undefined') return []
@@ -15,6 +21,17 @@ export const getWallets = (network: WalletAdapterNetwork) => {
 			 *     (https://github.com/solana-labs/wallet-standard)
 			 */
 			new SolflareWalletAdapter({ network }),
+			// new SolanaMobileWalletAdapter({
+			// 	addressSelector: createDefaultAddressSelector(),
+			// 	appIdentity: {
+			// 		name: 'My app',
+			// 		uri: 'https://myapp.io',
+			// 		icon: 'relative/path/to/icon.png',
+			// 	},
+			// 	authorizationResultCache: createDefaultAuthorizationResultCache(),
+			// 	cluster: network,
+			// 	onWalletNotFound: createDefaultWalletNotFoundHandler(),
+			// }),
 			phantomLedger,
 		]
 }
